@@ -35,19 +35,14 @@
         const rathen = [14.079849, 50.957274];
         const map = new maplibregl.Map({
             container: 'map',
-            style: 'https://tiles.openfreemap.org/styles/positron', // oder alternativ ein lokale .json Datei  
-            zoom: 12,
+            style: 'https://tiles.openfreemap.org/styles/bright', // oder alternativ ein lokale .json Datei  
+            zoom: 15,
             // Verweis auf die Koordinaten
             center: rathen,
+            pitch: 45,
             // Deaktivieren des Doppelklick-Zooms
             doubleClickZoom: false,
-            terrain: {
-                source: "terrain",
-            }
         });
-
-        // URL der OGC API, die die Daten der Apotheken in Dresden bereitstellt
-        const farmacyUrl = "https://kommisdd.dresden.de/net4/public/ogcapi/collections/L458/items";
 
         // Der folgende Code wird ausgeführt, sobald die Karte vollständig geladen ist
         map.on('load', () => {
@@ -56,10 +51,8 @@
             const nav = new maplibregl.NavigationControl();
             map.addControl(nav);
 
-            // Ein roter Marker an den Koordinaten von Dresden hinzugefügen
-            const marker = new maplibregl.Marker({ color: "red" }).setLngLat(dresden).addTo(map);
-
             // Speichern des Zoom-Level-Elements
+            // Dieses Element ist optional, es wird nur zum debuggen verwendet, um das aktuelle Zoom-Level anzuzeigen.
             const zoomDisplay = document.getElementById('zoom-level');
             // Setzt das zoom level direkt nachdem die Karte geladen ist
             zoomDisplay.textContent = map.getZoom().toFixed(2);
@@ -68,52 +61,15 @@
                 zoomDisplay.textContent = map.getZoom().toFixed(2);
             });
 
-            const protocol = new pmtiles.Protocol();
-            maplibregl.addProtocol("pmtiles", protocol.tile);
-            console.log({ protocol })
-
-
-            // TODO: Remove, only for debugging
-            map.addSource("coffee-shops", {
-                "type": "geojson",
-                "data": "germany-coffee-shops.geojson"
-            });
-
-            map.addSource("terrain", {
-                type: 'raster-dem',
-                tiles: [
-                    'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'
-                ],
-                tileSize: 256,
-                encoding: 'terrarium',
-                maxzoom: 15
-            })
-
-            map.addControl(new maplibregl.TerrainControl({
-                source: "terrain",
-                exaggeration: 2,
-            }));
-
-            map.addLayer({
-                id: 'hillshade',
-                type: 'hillshade',
-                source: 'terrain',
-                paint: {
-                    'hillshade-shadow-color': 'rgba(0, 0, 0, 0.5)',
-                    'hillshade-highlight-color': 'rgba(255, 255, 255, 0.5)',
-                }
-            });
-
-            map.addSource("dkk-demo-tiles", {
-                "type": "vector",
-                "url": "pmtiles://http://localhost:5500/dkk-demo.pmtiles"
-            })
-
+            // URL der OGC API, die die Daten der Apotheken in Dresden bereitstellt
+            const farmacyUrl = "https://kommisdd.dresden.de/net4/public/ogcapi/collections/L458/items";
+            // Remote GeoJSON Quelle hinzufügen
             map.addSource("farmacies", {
                 "type": "geojson",
                 "data": farmacyUrl
             });
 
+            // sprite für die Icons hinzufügen
             map.addSprite("phosphor", "https://latidudemaps.github.io/basemap-assets/sprites/phosphor/phosphor-sdf/fill")
 
             map.addLayer({
@@ -140,47 +96,114 @@
                 }
             });
 
-            map.addLayer({
-                "id": "coffee-shop-layer",
-                "type": "circle",
-                "source": "coffee-shops",
-                "paint": {
-                    "circle-radius": 5,
-                    "circle-color": "blue"
-                }
+            // lokale GeoJSON Quelle hinzufügen
+            map.addSource("pools-dresden", {
+                "type": "geojson",
+                "data": "data/freibaeder-dresden.geojson"
             });
 
             map.addLayer({
-                "id": "coffee-shop-layer-vector",
+                "id": "pools-dresden-layer",
+                "source": "pools-dresden",
                 "type": "circle",
-                "source": "dkk-demo-tiles",
-                "source-layer": "coffee-shops",
                 "paint": {
-                    "circle-radius": 3,
-                    "circle-color": "orange"
+                    "circle-radius": 4,
+                    "circle-color": "rgba(0, 0, 255, 1)"
                 }
             });
 
+            // lokale GeoJSON Quelle hinzufügen
+            map.addSource("dkk-venues", {
+                "type": "geojson",
+                "data": "data/dkk-venues.geojson"
+            });
 
-            map.on('click', 'farmacies-layer', (e) => {
+            map.addLayer({
+                "id": "dkk-venues-layer",
+                "source": "dkk-venues",
+                "type": "fill",
+                "paint": {
+                    "fill-color": "rgb(100, 200, 100)",
+                }
+            });
+            map.addLayer({
+                "id": "dkk-venues-layer-outline",
+                "source": "dkk-venues",
+                "type": "line",
+                "paint": {
+                    "line-color": "rgb(50, 100, 50)",
+                    "line-width": 2
+                }
+            });
+
+            // Terrain Quelle hinzufügen
+            map.addSource("terrain", {
+                type: 'raster-dem',
+                tiles: [
+                    'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'
+                ],
+                tileSize: 256,
+                encoding: 'terrarium',
+                maxzoom: 15
+            })
+
+            // Terrain mit Exaggeration hinzufügen
+            // map.setTerrain({ source: "terrain", exaggeration: 2 });
+
+            // Terrain Control hinzufügen, um das Terrain zu aktivieren/deaktivieren
+            map.addControl(new maplibregl.TerrainControl({
+                source: "terrain",
+                exaggeration: 2,
+            }));
+
+            // hillshade layer hinzufügen, um die Höhenunterschiede besser sichtbar zu machen
+            map.addLayer({
+                id: 'hillshade',
+                type: 'hillshade',
+                source: 'terrain',
+                paint: {
+                    'hillshade-shadow-color': 'rgba(0, 0, 0, 0.5)',
+                    'hillshade-highlight-color': 'rgba(255, 255, 255, 0.5)',
+                }
+            }, 'poi_r20'); // beforeId: hillshade layer unter den dkk-venues Layer legen
+
+
+            // Einen Marker manuell hinzufügen
+            const marker = new maplibregl.Marker({ color: "green" })
+                .setLngLat(rathen)
+                .addTo(map)
+                .setPopup(new maplibregl.Popup()
+                    .setText("Ich war hier!"));
+
+            // Funktion definieren die ausgeführt wird, wenn auf einen POI Layer geklickt wird
+            map.on('click', 'poi_r1', (e) => {
+                // Das erste Feature aus dem Event-Objekt extrahieren
                 const feature = e.features.at(0);
+                // Koordinaten des Features extrahieren
                 const { coordinates } = feature.geometry;
-                const { einrichtung: name, strasse: street } = feature.properties;
-                map.flyTo({ center: coordinates, zoom: 13 });
+                // Koordinaten und relevante Eigenschaften des Features extrahieren
+                const { name, class: featureClass } = feature.properties;
+                // Die Karte zu den Koordinaten des Features bewegen
+                map.flyTo({ center: coordinates });
 
+                // Popoup erstellen und zur Karte hinzufügen
                 new maplibregl.Popup()
                     .setLngLat(coordinates)
-                    .setHTML(`<strong>${name}</strong><br/>${street}`)
+                    .setHTML(`<strong>${name}</strong><br/><span>${featureClass}</span>`)
                     .addTo(map);
             });
+
+            // Mouse Cursor ändern, wenn er über einem POI Layer schwebt
+            // Cursor zu 'pointer' ändern wenn Maus ein Feature des poi_r1 Layers "betritt"
+            map.on('mouseenter', 'poi_r1', () => {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+
+            // Cursor zurücksetzen, wenn Maus den POI Layer verlässt
+            map.on('mouseleave', 'poi_r1', () => {
+                map.getCanvas().style.cursor = '';
+            });
         });
-
-        // (async () => {
-        //     const resp = await fetch(farmacyUrl);
-        //     const data = await resp.json();
-        //     console.table(data.features.map((f) => f.properties));
-        // })()
-
     </script>
 </body>
 
