@@ -21,6 +21,8 @@
             height: 100dvh;
         }
     </style>
+
+    <!-- Einbindung des pmtiles-Protokolls -->
     <script src="https://cdn.jsdelivr.net/npm/pmtiles@4.4.1/dist/pmtiles.min.js"></script>
 
 </head>
@@ -28,59 +30,87 @@
 <body>
     <div id="map"></div>
     <div id="zoom-level"
-        style="position: absolute; top: 10px; left: 10px; background: white; padding: 5px; border-radius: 3px;"></div>
+        style="position: absolute; top: 10px; left: 10px; background: white; padding: 5px; border-radius: 3px; font-family: sans-serif; box-shadow: 0 0 1em rgba(0,0,0,0.3);">
+    </div>
 
     <script>
+        // Koordinaten von Dresden: [Längengrad, Breitengrad]
         const dresden = [13.737359, 51.050407];
+        const rathen = [14.079849, 50.957274];
         const map = new maplibregl.Map({
             container: 'map',
-            style: 'https://tiles.openfreemap.org/styles/positron',
+            style: 'https://tiles.openfreemap.org/styles/positron', // oder alternativ ein lokale .json Datei  
             zoom: 12,
-            center: dresden
+            // Verweis auf die Koordinaten
+            center: rathen,
+            // Deaktivieren des Doppelklick-Zooms
+            doubleClickZoom: false,
+            terrain: {
+                source: "terrain",
+            }
         });
 
-        // no data loading required - just use the OGC API endpoint as GeoJSON source
-        // async data loading is handled internally by MapLibre GL JS
-        // only necessary if data is needed outside of the map context or needs preprocessing
-
-        // possibe extensions:
-        // - tweak basemap style (maputnik) 
-        // - refine point layer symbolization
-        // - add polygon and line layer
-        // - limit map zoom
-        // - add frame: title, legend?
-
+        // URL der OGC API, die die Daten der Apotheken in Dresden bereitstellt
         const farmacyUrl = "https://kommisdd.dresden.de/net4/public/ogcapi/collections/L458/items";
 
+        // Der folgende Code wird ausgeführt, sobald die Karte vollständig geladen ist
         map.on('load', () => {
-            const marker = new maplibregl.Marker({ color: "red" }).setLngLat(dresden).addTo(map);
 
+            // NavigationControl zur Karte hinzugefügen
             const nav = new maplibregl.NavigationControl();
             map.addControl(nav);
 
-            // Target the HTML element
-            const zoomDisplay = document.getElementById('zoom-level');
+            // Ein roter Marker an den Koordinaten von Dresden hinzugefügen
+            const marker = new maplibregl.Marker({ color: "red" }).setLngLat(dresden).addTo(map);
 
-            // Update the display whenever the user zooms
+            // Speichern des Zoom-Level-Elements
+            const zoomDisplay = document.getElementById('zoom-level');
+            // Setzt das zoom level direkt nachdem die Karte geladen ist
+            zoomDisplay.textContent = map.getZoom().toFixed(2);
+            // Aktualisiert den Inhalt des Zoom-Level-Elements
             map.on('zoom', () => {
                 zoomDisplay.textContent = map.getZoom().toFixed(2);
             });
-
-            // Initialize the zoom level immediately on load
-            zoomDisplay.textContent = map.getZoom().toFixed(2);
 
             const protocol = new pmtiles.Protocol();
             maplibregl.addProtocol("pmtiles", protocol.tile);
             console.log({ protocol })
 
+
+            // TODO: Remove, only for debugging
             map.addSource("coffee-shops", {
                 "type": "geojson",
                 "data": "germany-coffee-shops.geojson"
             });
 
-            map.addSource("coffee-shops-pmtiles", {
+            map.addSource("terrain", {
+                type: 'raster-dem',
+                tiles: [
+                    'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'
+                ],
+                tileSize: 256,
+                encoding: 'terrarium',
+                maxzoom: 15
+            })
+
+            map.addControl(new maplibregl.TerrainControl({
+                source: "terrain",
+                exaggeration: 2,
+            }));
+
+            map.addLayer({
+                id: 'hillshade',
+                type: 'hillshade',
+                source: 'terrain',
+                paint: {
+                    'hillshade-shadow-color': 'rgba(0, 0, 0, 0.5)',
+                    'hillshade-highlight-color': 'rgba(255, 255, 255, 0.5)',
+                }
+            });
+
+            map.addSource("dkk-demo-tiles", {
                 "type": "vector",
-                "url": "pmtiles://http://localhost:5500/germany-coffee-shops.pmtiles"
+                "url": "pmtiles://http://localhost:5500/dkk-demo.pmtiles"
             })
 
             map.addSource("farmacies", {
@@ -127,7 +157,7 @@
             map.addLayer({
                 "id": "coffee-shop-layer-vector",
                 "type": "circle",
-                "source": "coffee-shops-pmtiles",
+                "source": "dkk-demo-tiles",
                 "source-layer": "coffee-shops",
                 "paint": {
                     "circle-radius": 3,
@@ -149,11 +179,11 @@
             });
         });
 
-        (async () => {
-            const resp = await fetch(farmacyUrl);
-            const data = await resp.json();
-            console.table(data.features.map((f) => f.properties));
-        })()
+        // (async () => {
+        //     const resp = await fetch(farmacyUrl);
+        //     const data = await resp.json();
+        //     console.table(data.features.map((f) => f.properties));
+        // })()
 
     </script>
 </body>
