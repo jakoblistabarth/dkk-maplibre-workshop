@@ -4,7 +4,7 @@
 #import "globals.typ": github-repo-url
 
 #show: dkk-handout.with(
-  title: "Vectortiles mit MapLibre – Workshop-Handout",
+  title: "Interaktive Webmaps mit Vector Tiles und Maplibre – Workshop-Handout",
   author: "Jakob Listabarth",
   date: datetime(year: 2026, month: 5, day: 27, hour: 9, minute: 00, second: 0),
 )
@@ -17,7 +17,7 @@
   custom-date-format(document.date, lang: "de", pattern: "d. MMMM. y")
   document.date.display(", [hour]:[minute] Uhr")
   linebreak()
-  [74. DKK, Dresden]
+  [\74. DKK, Dresden]
 }
 
 #v(3em)

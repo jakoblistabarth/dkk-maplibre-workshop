@@ -60,12 +60,12 @@
         size: 7pt,
         upper[Notizen],
       )))
-      range(16)
+      range(14)
         .map(_ => line(
-          stroke: colors.tud.lighten(50%) + .5pt,
+          stroke: colors.tud.lighten(80%) + .5pt,
           length: 100%,
         ))
-        .join(v(.25em))
+        .join(v(.5em))
     },
   )
 }
