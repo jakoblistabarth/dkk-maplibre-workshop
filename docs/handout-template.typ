@@ -7,6 +7,7 @@
     date: date,
   )
   set page(
+    margin: (right: 12.5%),
     paper: "a4",
     header: context {
       set text(size: 6pt)
@@ -39,7 +40,7 @@
 
   show raw: set text(font: "Noto Sans Mono", fill: colors.tud, size: 1.1em)
 
-  show raw.where(block: true): it => block(width: 60%, it)
+  show raw.where(block: true): it => block(width: 75%, it)
 
   body
 }
@@ -59,7 +60,7 @@
         size: 7pt,
         upper[Notizen],
       )))
-      range(11)
+      range(16)
         .map(_ => line(
           stroke: colors.tud.lighten(50%) + .5pt,
           length: 100%,
