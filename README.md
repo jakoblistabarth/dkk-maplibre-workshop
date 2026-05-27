@@ -7,3 +7,26 @@ Alle Materialien finden Sie im Ordner `docs`.
 
 - Die Präsentationsfolien unter `docs/slides.pdf`
 - Das digitale Handout unter `docs/handout.pdf`
+
+# Links
+
+## Datenquellen
+
+- ⚕️ Apotheken Dresden: https://kommisdd.dresden.de/net4/public/ogcapi/collections/L458/items (vom [Open Data Portal Dresden](https://opendata.dresden.de/informationsportal/#app/mainpage////))
+- ⛰️ Gelände Daten Terrarium Tiles: https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png
+
+## Sprites
+
+- Phosphor Icons: "https://latidudemaps.github.io/basemap-assets/sprites/phosphor/regular"
+
+## Stile
+
+- OpenFreeMap: Bright https://tiles.openfreemap.org/styles/bright
+- OpenFreeMap: Positron https://tiles.openfreemap.org/styles/bright
+
+## Koordinaten
+
+```js
+const dresden = [13.737359, 51.050407];
+const rathen = [14.079849, 50.957274];
+```
