@@ -136,7 +136,7 @@ Das `index.html` file enthält den Code der gesamten Interaktiven Web-Karte: hie
 
 == #task Optionen der Karte verändern
 
-- Setzen Sie die Anfangsposition der Karte auf die Koordinaten von dem Ort aus dem Sie angereist sind. (Wenn Sie aus Dresden sind, dann wählen Sie den Ort der letzten DKK, Frankfurt).
+- Setzen Sie die Anfangsposition der Karte auf die Koordinaten von dem Ort aus dem Sie angereist sind.
   #hint[
     Reihenfolge der Koordinaten: [`Längengrad`, `Breitengrad`]]
 
@@ -156,9 +156,9 @@ Das `index.html` file enthält den Code der gesamten Interaktiven Web-Karte: hie
 
 == #task Maputnik 1
 
-- Passen Sie die Farbe der Elbe an: diese soll für unsere spezifische Karte mehr heraustechen.
+- Passen Sie die Farbe Wasserflächen (z. B. der Elbe) an: diese soll für unsere spezifische Karte mehr heraustechen.
   - Den entsprechenden Layer (bzw. deren ID) finden Sie am einfachsten wenn sie im "Inspect"-Modus auf die Elbe klicken
-  - Das Anpassen der Farbe müssen Sie das `paint` Attribute des entsprechenden Layers anpassen
+  - Für das Anpassen der Farbe müssen Sie das `paint` Attribute des entsprechenden Layers anpassen
 
 == Click-Along: Eigene Icons einbauen
 - `sprites` hinzufügen
@@ -168,7 +168,7 @@ Das `index.html` file enthält den Code der gesamten Interaktiven Web-Karte: hie
 
 - Fügen sie Icons für Geschäfte hinzu, die in den Vectortiles als Punkte enthalten sind.
   - der `source_layer` heißt `poi` (_points of interest_)
-  - Die _Phosphor_ Icons finden Sie auf https://phosphoricons.com
+  - Eine Übersicht der _Phosphor_ Icons finden Sie auf https://phosphoricons.com, das entsprechende sprite für MapLibre finden Sie unter https://latidudemaps.github.io/basemap-assets/sprites/
   - Filter Bedingung: `class` entspricht dem Wert `"shop"`
 
 == Code Along: Style.json Datei einbinden
