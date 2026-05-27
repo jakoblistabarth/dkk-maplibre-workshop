@@ -21,8 +21,9 @@ Alle Materialien finden Sie im Ordner `docs`.
 
 ## Stile
 
-- OpenFreeMap: Bright https://tiles.openfreemap.org/styles/bright
-- OpenFreeMap: Positron https://tiles.openfreemap.org/styles/bright
+- OpenFreeMap – Bright: https://tiles.openfreemap.org/styles/bright
+- OpenFreeMap – Positron: https://tiles.openfreemap.org/styles/positron
+- MapLibre Demo Tiles: https://demotiles.maplibre.org/globe.json
 
 ## Koordinaten
 
